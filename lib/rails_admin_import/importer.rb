@@ -80,7 +80,27 @@ module RailsAdminImport
         report_error(object, action, error)
         return
       end
+      ############################ MONKEY PATCHING  ##############################################
+      # To access current user id in model for import action just params[ :current_user_id] 
+      # from application for this specific action like this.
+      #
+      # before_action :set_user
+      # 
+      # def set_user
+      #   if  params[ :controller] == "rails_admin/main" && params[ :action] =="import" && params[ :model_name] == "product"
+      #     params[ :current_user_id] = current_user.id
+      #   end
+      # end
+      #
+      # Add user_id field to your model it will reflect in your callback of before import save
+      #
+      #
 
+
+
+      record[ :user_id] = params[ :current_user_id]   if object.attributes.keys.include? "user_id"
+
+      ############################################################################################
       perform_model_callback(object, :before_import_save, record)
 
       if object.save
